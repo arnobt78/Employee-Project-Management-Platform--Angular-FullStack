@@ -1,8 +1,6 @@
-# EmpowerHub - Modern Employee & Project Management Platform - Angular 18, TypeScript, MongoDB Full-Stack Serverless Application (Including Real-time Dashboard, Calendar, Gantt Chart, Business Insights, API Monitoring)
+# Modern Employee & Project Management Platform - Angular 18, TypeScript, MongoDB Full-Stack Serverless Application (Including Real-time Dashboard, Calendar, Gantt Chart, Business Insights, API Monitoring)
 
 A comprehensive, full-stack Employee Management System built with **Angular 18**, featuring real-time dashboards, project tracking, calendar views, Gantt charts, business insights, and API monitoring. This is a production-ready CRUD application demonstrating modern web development practices with serverless architecture.
-
-- **Live-Demo:** []()
 
 ---
 
@@ -541,7 +539,7 @@ Gantt chart for project visualization:
 
 ### How to Reuse Components
 
-1. **Import the component** in your module or standalone component:
+**Step 1: Import the component** in your module or standalone component:
 
 ```typescript
 import { CalendarViewComponent } from '@/app/components/calendar-view/calendar-view.component';
@@ -553,13 +551,13 @@ import { CalendarViewComponent } from '@/app/components/calendar-view/calendar-v
 })
 ```
 
-2. **Use in template**:
+**Step 2: Use in template**:
 
 ```html
 <app-calendar-view [events]="myEvents"></app-calendar-view>
 ```
 
-3. **Customize with inputs and outputs**:
+**Step 3: Customize with inputs and outputs**:
 
 ```typescript
 // Component inputs

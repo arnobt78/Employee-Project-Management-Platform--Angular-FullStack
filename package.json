@@ -1,6 +1,6 @@
 {
-  "name": "employee-management-app-angular18",
-  "version": "0.0.0",
+  "name": "employee-management",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "concurrently \"npm run api:dev\" \"npm run start:frontend\"",
