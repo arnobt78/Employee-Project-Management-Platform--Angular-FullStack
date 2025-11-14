@@ -2845,8 +2845,9 @@ export async function handleEmployeeManagementRequest(request, response) {
         }
 
         if (action === "GetProjectResources") {
-          const projectId = Number(rawId);
-          if (!projectId) {
+          // Support both path parameter (GetProjectResources/5001) and query parameter (GetProjectResources?id=5001)
+          const projectId = Number(rawId || url.searchParams.get("id"));
+          if (!projectId || isNaN(projectId)) {
             return sendJson(
               response,
               400,

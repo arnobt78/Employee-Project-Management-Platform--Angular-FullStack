@@ -83,9 +83,9 @@ export class MasterService {
   getProjectResourceInsights(
     id: number
   ): Observable<IProjectResourceInsights> {
-    return this.http.get<IProjectResourceInsights>(
-      this.getProxyUrl('GetProjectResources/' + id)
-    );
+    // Use query parameter as workaround for Vercel routing issue with path parameters
+    const queryUrl = this.getProxyUrl('GetProjectResources') + `?id=${id}`;
+    return this.http.get<IProjectResourceInsights>(queryUrl);
   }
 
   fetchContentfulBrief(params: {
