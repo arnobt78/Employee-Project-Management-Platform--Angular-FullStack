@@ -1871,8 +1871,8 @@ function generateNotificationToken() {
 function normalizePathname(url) {
   let pathname = url.pathname || "";
 
-  // Remove leading slashes
-  pathname = pathname.replace(/^\/+/, "");
+  // Remove leading and trailing slashes
+  pathname = pathname.replace(/^\/+|\/+$/g, "");
 
   // Handle empty pathname
   if (!pathname) {
@@ -1881,43 +1881,70 @@ function normalizePathname(url) {
 
   const parts = pathname.split("/").filter((p) => p.length > 0);
 
-  // On Vercel, the serverless function receives the path relative to the function location
-  // So /api/employee-management/GetProject/5001 becomes /GetProject/5001 in the segments
-  // But request.url might still have the full path, so we need to handle both cases
+  // Debug: log the parts to understand the structure
+  console.log("[normalizePathname] Input pathname:", pathname);
+  console.log("[normalizePathname] Parts:", parts);
 
-  // Check if this is already normalized (starts with an action like "GetProject", not "api")
-  if (
-    parts.length > 0 &&
-    parts[0] !== "api" &&
-    parts[0] !== "employee-management"
-  ) {
-    // Already normalized (Vercel case or direct call)
-    return parts.join("/");
-  }
+  // On Vercel, request.url contains the full path: /api/employee-management/GetProject/5001
+  // On localhost, it's the same: /api/employee-management/GetProject/5001
+  // We need to extract: GetProject/5001
 
   // Find the index of "employee-management" to know where to start slicing
   const employeeManagementIndex = parts.findIndex(
     (p) => p === "employee-management"
   );
 
-  if (
-    employeeManagementIndex >= 0 &&
-    parts.length > employeeManagementIndex + 1
-  ) {
-    // Skip up to and including "employee-management", take the rest
-    return parts.slice(employeeManagementIndex + 1).join("/");
+  if (employeeManagementIndex >= 0) {
+    // We found "employee-management", skip up to and including it
+    const remainingParts = parts.slice(employeeManagementIndex + 1);
+    const result = remainingParts.join("/");
+    console.log(
+      "[normalizePathname] Found employee-management at index:",
+      employeeManagementIndex
+    );
+    console.log("[normalizePathname] Result:", result);
+    return result;
   }
 
-  // Localhost case: remove "api" and "employee-management" prefixes
+  // If "employee-management" is not found, check if it starts with "api"
   // Path structure: /api/employee-management/GetProject/5001
   // After split: ["api", "employee-management", "GetProject", "5001"]
   // We want: "GetProject/5001"
-  if (parts.length <= 2) {
-    return "";
+  if (
+    parts.length >= 3 &&
+    parts[0] === "api" &&
+    parts[1] === "employee-management"
+  ) {
+    const result = parts.slice(2).join("/");
+    console.log(
+      "[normalizePathname] Using api/employee-management pattern, result:",
+      result
+    );
+    return result;
   }
 
-  // Skip first two parts (api, employee-management) and join the rest
-  return parts.slice(2).join("/");
+  // If it doesn't start with "api" or "employee-management", assume it's already normalized
+  // This handles cases where the path is already just "GetProject/5001"
+  if (
+    parts.length > 0 &&
+    parts[0] !== "api" &&
+    parts[0] !== "employee-management"
+  ) {
+    const result = parts.join("/");
+    console.log("[normalizePathname] Already normalized, result:", result);
+    return result;
+  }
+
+  // Fallback: if we have at least 2 parts, skip the first two
+  if (parts.length > 2) {
+    const result = parts.slice(2).join("/");
+    console.log("[normalizePathname] Fallback (slice 2), result:", result);
+    return result;
+  }
+
+  // Last resort: return empty string
+  console.log("[normalizePathname] Returning empty string");
+  return "";
 }
 
 function findEmployee(store, id) {
@@ -2656,7 +2683,7 @@ function buildApiDocumentation(request) {
 
 export async function handleEmployeeManagementRequest(request, response) {
   // Handle Vercel serverless function format
-  // On Vercel, request.url might be the full path or just the segments
+  // On Vercel, request.url contains the full path including /api/employee-management/...
   let requestUrl = request.url || "";
 
   // Handle relative URLs (Vercel serverless functions)
@@ -2689,16 +2716,21 @@ export async function handleEmployeeManagementRequest(request, response) {
   const requestPath = normalizePathname(url);
 
   // Debug logging for troubleshooting (works in both dev and production on Vercel)
-  console.log("[Handler] Request URL:", requestUrl);
-  console.log("[Handler] Pathname:", url.pathname);
+  console.log("[Handler] Original request.url:", request.url);
+  console.log("[Handler] Constructed requestUrl:", requestUrl);
+  console.log("[Handler] URL pathname:", url.pathname);
   console.log("[Handler] Normalized path:", requestPath);
   console.log("[Handler] Method:", request.method);
-  console.log("[Handler] Headers:", JSON.stringify(request.headers));
 
   const pathParts = requestPath.split("/").filter((p) => p.length > 0);
   const action = pathParts[0] || "";
   const rawId = pathParts[1] || "";
   const method = (request.method || "GET").toUpperCase();
+
+  // Additional debug for path parsing
+  console.log("[Handler] Path parts:", pathParts);
+  console.log("[Handler] Action:", action);
+  console.log("[Handler] Raw ID:", rawId);
 
   // Start timing the request
   const requestStartTime = Date.now();
