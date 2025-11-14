@@ -3146,7 +3146,15 @@ export async function handleEmployeeManagementRequest(request, response) {
         const body = await readRequestBody(request);
 
         if (action === "UpdateEmployee") {
-          const employeeId = Number(rawId);
+          const employeeId = Number(rawId || url.searchParams.get("id"));
+          if (!employeeId || isNaN(employeeId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid employee identifier"),
+              statusCodeRef
+            );
+          }
           try {
             const employee = await updateEmployee(employeeId, body ?? {});
             // Send email notification for employee update
@@ -3175,7 +3183,15 @@ export async function handleEmployeeManagementRequest(request, response) {
         }
 
         if (action === "UpdateProject") {
-          const projectId = Number(rawId);
+          const projectId = Number(rawId || url.searchParams.get("id"));
+          if (!projectId || isNaN(projectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project identifier"),
+              statusCodeRef
+            );
+          }
           try {
             const project = await updateProject(projectId, body ?? {});
             // Send email notification for project update
@@ -3195,7 +3211,15 @@ export async function handleEmployeeManagementRequest(request, response) {
         }
 
         if (action === "UpdateProjectEmployee") {
-          const empProjectId = Number(rawId);
+          const empProjectId = Number(rawId || url.searchParams.get("id"));
+          if (!empProjectId || isNaN(empProjectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project employee identifier"),
+              statusCodeRef
+            );
+          }
           try {
             const projectEmployee = await updateProjectEmployee(
               empProjectId,
@@ -3222,7 +3246,15 @@ export async function handleEmployeeManagementRequest(request, response) {
 
       case "DELETE": {
         if (action === "DeleteEmployee") {
-          const employeeId = Number(rawId);
+          const employeeId = Number(rawId || url.searchParams.get("id"));
+          if (!employeeId || isNaN(employeeId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid employee identifier"),
+              statusCodeRef
+            );
+          }
           try {
             const deletedEmployee = await deleteEmployee(employeeId);
             // Send email notification for employee deletion
@@ -3250,7 +3282,15 @@ export async function handleEmployeeManagementRequest(request, response) {
         }
 
         if (action === "DeleteProject") {
-          const projectId = Number(rawId);
+          const projectId = Number(rawId || url.searchParams.get("id"));
+          if (!projectId || isNaN(projectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project identifier"),
+              statusCodeRef
+            );
+          }
           try {
             // Fetch stakeholders before deletion for notification
             let projectRecipients = { to: [], cc: [], bcc: [] };
@@ -3289,7 +3329,15 @@ export async function handleEmployeeManagementRequest(request, response) {
         }
 
         if (action === "DeleteProjectEmployee") {
-          const empProjectId = Number(rawId);
+          const empProjectId = Number(rawId || url.searchParams.get("id"));
+          if (!empProjectId || isNaN(empProjectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project employee identifier"),
+              statusCodeRef
+            );
+          }
           try {
             const deletedAssignment = await deleteProjectEmployee(empProjectId);
             // Send email notification for assignment deletion

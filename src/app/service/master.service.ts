@@ -46,16 +46,13 @@ export class MasterService {
   }
 
   updateEmp(obj: Employee): Observable<IApiResponse> {
-    return this.http.put<IApiResponse>(
-      this.getProxyUrl('UpdateEmployee/' + obj.employeeId),
-      obj
-    );
+    const queryUrl = this.getProxyUrl('UpdateEmployee') + `?id=${obj.employeeId}`;
+    return this.http.put<IApiResponse>(queryUrl, obj);
   }
 
   deleteEmpById(id: number): Observable<IApiResponse> {
-    return this.http.delete<IApiResponse>(
-      this.getProxyUrl('DeleteEmployee/' + id)
-    );
+    const queryUrl = this.getProxyUrl('DeleteEmployee') + `?id=${id}`;
+    return this.http.delete<IApiResponse>(queryUrl);
   }
 
   saveProject(obj: IProject): Observable<IProject> {
@@ -63,10 +60,8 @@ export class MasterService {
   }
 
   updateProject(obj: IProject): Observable<IProject> {
-    return this.http.put<IProject>(
-      this.getProxyUrl('UpdateProject/' + obj.projectId),
-      obj
-    );
+    const queryUrl = this.getProxyUrl('UpdateProject') + `?id=${obj.projectId}`;
+    return this.http.put<IProject>(queryUrl, obj);
   }
 
   getAllProjects(): Observable<IProject[]> {
@@ -125,9 +120,8 @@ export class MasterService {
   }
 
   deleteProjectById(id: number): Observable<IApiResponse> {
-    return this.http.delete<IApiResponse>(
-      this.getProxyUrl('DeleteProject/' + id)
-    );
+    const queryUrl = this.getProxyUrl('DeleteProject') + `?id=${id}`;
+    return this.http.delete<IApiResponse>(queryUrl);
   }
 
   requestProjectApproval(
@@ -212,16 +206,14 @@ export class MasterService {
   }
 
   updateProjectEmp(obj: IProjectEmployee): Observable<IProjectEmployee> {
-    return this.http.put<IProjectEmployee>(
-      this.getProxyUrl('UpdateProjectEmployee/' + obj.empProjectId),
-      obj
-    );
+    const queryUrl =
+      this.getProxyUrl('UpdateProjectEmployee') + `?id=${obj.empProjectId}`;
+    return this.http.put<IProjectEmployee>(queryUrl, obj);
   }
 
   deleteProjectEmpById(id: number): Observable<IApiResponse> {
-    return this.http.delete<IApiResponse>(
-      this.getProxyUrl('DeleteProjectEmployee/' + id)
-    );
+    const queryUrl = this.getProxyUrl('DeleteProjectEmployee') + `?id=${id}`;
+    return this.http.delete<IApiResponse>(queryUrl);
   }
 
   getDashboardData(): Observable<any> {
