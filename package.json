@@ -10,7 +10,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "vercel-dev": "node -e \"console.log('Vercel dev ready'); setInterval(() => {}, 1 << 30);\"",
-    "postinstall": "node tools/generate-env-prod.js"
+    "postinstall": "node tools/generate-env-prod.cjs"
   },
   "private": true,
   "dependencies": {
