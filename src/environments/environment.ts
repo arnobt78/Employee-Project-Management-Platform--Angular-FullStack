@@ -15,8 +15,8 @@ const fromEnv = (key: string, fallback: string) => {
 export const environment = {
   production: false,
   demoLogin: {
-    username: fromEnv('NG_APP_DEMO_USERNAME', ''),
-    password: fromEnv('NG_APP_DEMO_PASSWORD', ''),
+    username: 'admin',
+    password: '112233',
   },
   api: {
     baseUrl: fromEnv('NG_APP_API_BASE_URL', '/api/employee-management/'),
