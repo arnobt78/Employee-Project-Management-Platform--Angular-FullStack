@@ -2786,7 +2786,16 @@ export async function handleEmployeeManagementRequest(request, response) {
         }
 
         if (action === "GetProject") {
-          const projectId = Number(rawId);
+          // Support both path parameter (GetProject/5001) and query parameter (GetProject?id=5001)
+          const projectId = Number(rawId || url.searchParams.get("id"));
+          if (!projectId || isNaN(projectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project ID"),
+              statusCodeRef
+            );
+          }
           const project = await getProjectById(projectId);
           if (!project) {
             return sendJson(

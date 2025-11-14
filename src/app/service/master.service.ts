@@ -74,7 +74,10 @@ export class MasterService {
   }
 
   getProjectById(id: number): Observable<IProject> {
-    return this.http.get<IProject>(this.getProxyUrl('GetProject/' + id));
+    // Use query parameter as workaround for Vercel routing issue with path parameters
+    // Try query parameter first (works on Vercel), fallback to path parameter (works on localhost)
+    const queryUrl = this.getProxyUrl('GetProject') + `?id=${id}`;
+    return this.http.get<IProject>(queryUrl);
   }
 
   getProjectResourceInsights(
