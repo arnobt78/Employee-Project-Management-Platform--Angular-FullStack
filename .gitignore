@@ -79,3 +79,5 @@ lerna-debug.log*
 .cache
 dataset
 dataset/
+
+HETZNER_VPS_MIGRATION_GUIDE.md
