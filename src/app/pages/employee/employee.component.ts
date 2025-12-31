@@ -40,6 +40,8 @@ export class EmployeeComponent implements OnInit {
   editingEmployeeId: number | null = null;
   showCreatePanel = false;
   pendingDelete: Employee | null = null;
+  isSaving = false;
+  isDeleting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -87,6 +89,7 @@ export class EmployeeComponent implements OnInit {
   }
 
   startCreate() {
+    this.isSaving = false;
     this.showCreatePanel = true;
     this.editingEmployeeId = null;
     this.expandedEmployeeId = null;
@@ -106,6 +109,11 @@ export class EmployeeComponent implements OnInit {
       skills: '',
       tags: '',
     });
+  }
+
+  closeCreatePanel() {
+    this.isSaving = false;
+    this.showCreatePanel = false;
   }
 
   onEdit(employee: Employee) {
@@ -143,6 +151,7 @@ export class EmployeeComponent implements OnInit {
   }
 
   cancelEdit() {
+    this.isSaving = false;
     this.editingEmployeeId = null;
     this.employeeForm.reset({
       employeeId: null,
@@ -172,9 +181,11 @@ export class EmployeeComponent implements OnInit {
       return;
     }
     const { employeeId, employeeName } = this.pendingDelete;
-    this.pendingDelete = null;
+    this.isDeleting = true;
     this.masterService.deleteEmpById(employeeId).subscribe(
       () => {
+        this.isDeleting = false;
+        this.pendingDelete = null;
         this.employeesSignal.update((list) =>
           list.filter((emp) => emp.employeeId !== employeeId)
         );
@@ -187,6 +198,7 @@ export class EmployeeComponent implements OnInit {
         }
       },
       () => {
+        this.isDeleting = false;
         this.toast.error({
           title: 'Deletion failed',
           description: 'Unable to delete the employee right now.',
@@ -196,12 +208,14 @@ export class EmployeeComponent implements OnInit {
   }
 
   onSave() {
-    if (this.employeeForm.valid) {
+    if (this.employeeForm.valid && !this.isSaving) {
       const employee = this.normalizePayload(this.employeeForm.value);
+      this.isSaving = true;
       if (employee.employeeId) {
         // Update existing employee
         this.masterService.updateEmp(employee).subscribe(
           () => {
+            this.isSaving = false;
             this.getEmployees();
             this.employeeForm.reset();
             this.toast.success({
@@ -211,6 +225,7 @@ export class EmployeeComponent implements OnInit {
             this.editingEmployeeId = null;
           },
           () => {
+            this.isSaving = false;
             this.toast.error({
               title: 'Update failed',
               description: 'Something went wrong while saving changes.',
@@ -221,6 +236,7 @@ export class EmployeeComponent implements OnInit {
         // Create new employee
         this.masterService.saveEmp(employee).subscribe(
           () => {
+            this.isSaving = false;
             this.getEmployees();
             this.employeeForm.reset();
             this.toast.success({
@@ -230,6 +246,7 @@ export class EmployeeComponent implements OnInit {
             this.showCreatePanel = false;
           },
           () => {
+            this.isSaving = false;
             this.toast.error({
               title: 'Creation failed',
               description: 'Unable to save the new employee.',

@@ -2016,10 +2016,11 @@
 
 <div
   *ngIf="pendingDelete()"
-  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4"
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 overflow-y-auto"
+  style="min-height: 100vh;"
 >
   <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)] my-auto"
   >
     <h2 class="text-lg font-semibold text-white">Archive this project?</h2>
     <p class="mt-2 text-white/70">

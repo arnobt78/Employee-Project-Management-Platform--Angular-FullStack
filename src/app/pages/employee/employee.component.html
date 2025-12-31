@@ -49,8 +49,9 @@
       </div>
       <button
         type="button"
-        class="text-xs text-white/60 transition hover:text-white"
-        (click)="showCreatePanel = false"
+        [disabled]="isSaving"
+        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="closeCreatePanel()"
       >
         Cancel
       </button>
@@ -59,6 +60,7 @@
       [formGroup]="employeeForm"
       (ngSubmit)="onSave()"
       class="grid gap-4 sm:grid-cols-2"
+      [class.opacity-50]="isSaving"
     >
       <div class="sm:col-span-1">
         <label
@@ -246,9 +248,11 @@
           type="submit"
           ubButton
           size="sm"
-          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+          [disabled]="isSaving"
+          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save employee
+          <span *ngIf="!isSaving">Save employee</span>
+          <span *ngIf="isSaving">Saving employee...</span>
         </button>
       </div>
     </form>
@@ -304,6 +308,7 @@
             [formGroup]="employeeForm"
             class="grid gap-4 md:grid-cols-2"
             (ngSubmit)="onSave()"
+            [class.opacity-50]="isSaving"
           >
             <div class="md:col-span-1">
               <label
@@ -477,7 +482,8 @@
             <div class="md:col-span-2 flex justify-end gap-3 pt-2">
               <button
                 type="button"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                [disabled]="isSaving"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 (click)="cancelEdit()"
               >
                 Cancel
@@ -486,9 +492,11 @@
                 type="submit"
                 ubButton
                 size="sm"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                [disabled]="isSaving"
+                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save changes
+                <span *ngIf="!isSaving">Save changes</span>
+                <span *ngIf="isSaving">Updating...</span>
               </button>
             </div>
           </form>
@@ -650,10 +658,11 @@
 
 <div
   *ngIf="pendingDelete as toDelete"
-  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4"
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 overflow-y-auto"
+  style="min-height: 100vh;"
 >
   <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)] my-auto"
   >
     <h2 class="text-lg font-semibold text-white">
       Delete {{ toDelete.employeeName }}?
@@ -665,18 +674,21 @@
     <div class="mt-6 flex justify-end gap-3">
       <button
         type="button"
-        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(false)"
       >
         Cancel
       </button>
       <button
         type="button"
-        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(true)"
       >
-        Delete employee
-        </button>
+        <span *ngIf="!isDeleting">Delete employee</span>
+        <span *ngIf="isDeleting">Deleting...</span>
+      </button>
     </div>
   </div>
 </div>
