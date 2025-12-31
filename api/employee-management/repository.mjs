@@ -165,15 +165,72 @@ async function getNextSequenceValue(key, startAt) {
     });
   }
 
-  const { value } = await prisma.counter.update({
-    where: { key },
-    data: {
-      value: { increment: 1 },
-    },
-    select: { value: true },
-  });
+  // Try Prisma update first
+  let updateResult = null;
+  try {
+    updateResult = await prisma.counter.update({
+      where: { key },
+      data: {
+        value: { increment: 1 },
+      },
+      select: { value: true },
+    });
+  } catch (error) {
+    console.warn(`[getNextSequenceValue] Prisma counter update failed for key ${key}, using MongoDB native driver:`, error.message);
+  }
 
-  return value;
+  // If Prisma update failed or returned null, use MongoDB native driver
+  if (!updateResult || !updateResult.value) {
+    const databaseUrl =
+      process.env.NG_APP_PRISMA_URL ||
+      process.env.NG_APP_MONGODB_URI ||
+      process.env.DATABASE_URL ||
+      process.env.MONGODB_URI;
+    
+    if (!databaseUrl) {
+      throw new Error("DATABASE_URL not found in environment variables");
+    }
+    
+    const client = new MongoClient(databaseUrl);
+    try {
+      await client.connect();
+      
+      // Extract database name from connection string
+      const dbName = databaseUrl.split("/").pop()?.split("?")[0] || "employee_management_db";
+      const db = client.db(dbName);
+      const collection = db.collection("Counter");
+      
+      // Use MongoDB $inc to increment the counter
+      const mongoResult = await collection.findOneAndUpdate(
+        { key },
+        { $inc: { value: 1 } },
+        { 
+          returnDocument: 'after',
+          upsert: false // Don't create if doesn't exist (should exist from create above)
+        }
+      );
+      
+      if (!mongoResult || !mongoResult.value) {
+        throw new Error(`Failed to increment counter for key ${key}`);
+      }
+      
+      // Fetch the updated value using Prisma
+      const counter = await prisma.counter.findUnique({
+        where: { key },
+        select: { value: true },
+      });
+      
+      if (!counter) {
+        throw new Error(`Counter not found after MongoDB increment for key ${key}`);
+      }
+      
+      return counter.value;
+    } finally {
+      await client.close();
+    }
+  }
+
+  return updateResult.value;
 }
 
 async function ensureBootstrapData() {
